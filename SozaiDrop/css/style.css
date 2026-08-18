@@ -1,0 +1,432 @@
+/* ===== 配色（案C「明るい（ライト）」・2026-08-03 ユーザー選択）=====
+   色はすべてここに集約し、下の規則からは var(--sd-…) で引く。
+   別の配色に替えたいときは、この :root の値だけを差し替えれば全体が変わる
+   （下の規則には色を直接書かない。書くとここを差し替えても変わらなくなる）。
+   CEP11＝Chromium 88 なので var() は使える（CSXS/manifest.xml の RequiredRuntime 11.0）。
+   色の意味づけ: 赤＝2回押し確定待ち・エラー／黄土色＝お気に入り・使用済み・☑選択中／
+   緑＝成功／青＝選択中・主要ボタン。ここは配色を替えても変えないこと */
+:root {
+  /* 明るい地色に合わせて、スクロールバー・チェックボックス・スライダーなど
+     ブラウザが描く部品も明るい側で描かせる（CEPが暗い既定を持ち込むと浮くため明示） */
+  color-scheme: light;
+
+  --sd-bg: #e7eaef;               /* パネルの地色 */
+  --sd-fg: #22252a;               /* 既定の文字 */
+  --sd-fg-dim: #535a64;           /* 補助の文字（①②③④のラベル・下段ラベル・0件案内） */
+  --sd-divider: #c8cdd4;          /* 仕切り線 */
+
+  --sd-card-bg: #ffffff;          /* 座布団（一覧の各行）の地色 */
+  --sd-card-fg: #1d2025;          /* 座布団の上の文字（ファイル名） */
+  --sd-card-border: #c9d0d9;      /* 座布団のふち */
+  --sd-card-border-hover: #1f66bd;/* カーソルを乗せたときのふち */
+
+  --sd-ghead-bg: #c6d9f1;         /* グループ見出し帯の地色 */
+  --sd-ghead-fg: #143355;         /* 見出し帯の文字 */
+  --sd-ghead-bg-hover: #b3c9e8;   /* 見出し帯（ホバー） */
+  --sd-ghead-arrow: #2c4a6d;      /* 開閉の▾矢印 */
+  --sd-gcount-bg: #ffffff;        /* 見出しの件数バッジの地色 */
+  --sd-gcount-fg: #44546a;        /* 件数バッジの文字 */
+
+  --sd-fav-bg: #f5dea0;           /* ★よく使う帯の地色 */
+  --sd-fav-fg: #40300a;           /* ★よく使う帯の文字 */
+  --sd-fav-bg-hover: #eed48c;     /* ★帯（ホバー） */
+  --sd-usage-bg: #f5dea0;         /* 使用回数バッジの地色 */
+  --sd-usage-fg: #40300a;         /* 使用回数バッジの文字 */
+  --sd-checked-bg: #fbeec6;       /* ☑選択中の行の地色 */
+  --sd-checked-border: #a8801d;   /* ☑選択中の行のふち */
+  --sd-checked-fg: #40300a;       /* ☑選択中の行の文字 */
+  --sd-mark-bg: #f0d79a;          /* ☑モードONボタンの地色 */
+  --sd-mark-border: #a8801d;      /* 同ふち */
+  --sd-mark-fg: #40300a;          /* 同文字 */
+
+  --sd-btn-bg: #e2e6ec;           /* ボタンの地色 */
+  --sd-btn-fg: #22252a;           /* ボタンの文字 */
+  --sd-btn-border: #b4bcc6;       /* ボタンのふち */
+  --sd-btn-bg-hover: #d2d8e0;     /* ボタン（ホバー） */
+  --sd-btn-fg-disabled: #767e89;  /* 押せないボタンの文字 */
+
+  --sd-accent: #2f6bb5;           /* 主要ボタン・選択中の青 */
+  --sd-accent-fg: #ffffff;        /* 青の上の文字 */
+  --sd-accent-hover: #255a9c;     /* 青（ホバー） */
+  --sd-pill-fg: #4a5260;          /* 未選択の絞り込みボタンの文字 */
+  --sd-pill-fg-hover: #22252a;    /* 同（ホバー） */
+  --sd-km-border: #b4bcc6;        /* 挿入先ボタンのふち */
+  --sd-count-fg: #1d4e8f;         /* ④の件数の文字 */
+
+  /* ①②③④の段ごとの色分け。濃いほう（--sd-secN）＝左の帯と見出しの文字、
+     薄いほう（--sd-secNbg）＝座布団（段の下地）。
+     この配色は「明るい」ので〈濃い文字を薄い座布団に載せる〉。暗い配色へ替えるときは
+     濃さの役割が逆になる（薄い文字を濃い座布団に載せる）ので、両方まとめて差し替えること。
+     どの組み合わせも本文が4.5:1以上で読める値を選んである（test/harness.html が実測で見張る） */
+  --sd-sec1: #00566a;             /* ① 種類（水色の濃いほう） */
+  --sd-sec2: #0d5a4e;             /* ② 場所（緑） */
+  --sd-sec3: #66308f;             /* ③ 場面・内訳・フリー/楽曲（紫） */
+  --sd-sec4: #8a4212;             /* ④ 中身の一覧（だいだい） */
+  /* ①だけ「ふつうの青」ではなく水色。④の一覧の中には青系の濃い色が何種類も並ぶので
+     （グループ見出しの帯 --sd-ghead-bg #c6d9f1／見出しの文字 --sd-ghead-fg #143355／
+     ▾矢印 --sd-ghead-arrow #2c4a6d／件数 --sd-count-fg #1d4e8f／件数バッジ --sd-gcount-fg #44546a）、
+     ①を同じ青系にすると「青＝①の段」の印が④の区画で何度も繰り返され、色分けの意味そのものが壊れる。
+     見出しの帯と同じ色相のまま 10 以上離すことは、文字が4.5:1で読める明るさの範囲では不可能
+     （実測の最良が 9.4）。だから色相ごと水色へ寄せてある。ここを「青らしい青」に戻さないこと
+     （test/harness.html が ΔE2000 で見張っていて、戻すと赤くなる）。
+     ★濃い側と薄い側は必ずセットで選び直すこと。1周目は座布団だけ #cfe0f5→#9ae7fe に替えて
+     濃い側 #164a80 を置き去りにしたため、①の帯と見出しの文字が④の中の ▾矢印（ΔE2000＝3.7）・
+     件数（2.4）と見分けられないまま残っていた（2周目レビューで発覚）。
+     いまの #00566a は④の濃い色4つ＋②③④に対して最小 ΔE2000＝12.6、
+     座布団 #9ae7fe の上で 6.00:1、パネルの地色の上で 6.86:1 */
+  --sd-sec1bg: #9ae7fe;           /* ①の座布団（水色） */
+  --sd-sec2bg: #c6e6dd;           /* ②の座布団 */
+  --sd-sec3bg: #ecd6f3;           /* ③の座布団 */
+  --sd-sec4bg: #f9dcc9;           /* ④の座布団 */
+
+  --sd-input-bg: #ffffff;         /* 入力欄・プルダウンの地色 */
+  --sd-input-fg: #22252a;         /* 入力欄・プルダウンの文字 */
+  --sd-input-border: #a9b2be;     /* 入力欄・プルダウンのふち */
+  --sd-placeholder: #6b7280;      /* 入力欄の薄い案内文字 */
+
+  --sd-arm-bg: #b8322a;           /* 2回押し確定待ちの地色 */
+  --sd-arm-border: #8f221c;       /* 同ふち */
+  --sd-arm-fg: #ffffff;           /* 同文字 */
+  --sd-error: #b3261e;            /* エラー文字 */
+  --sd-success: #1c6e30;          /* 成功文字 */
+
+  --sd-tagbtn-bg: #57616f;        /* 🏷ボタンの地色 */
+  --sd-tagbtn-fg: #ffffff;        /* 🏷ボタンの文字 */
+
+  --sd-menu-bg: #ffffff;          /* トラック選択メニュー・タグ入力小窓の地色 */
+  --sd-menu-fg: #22252a;          /* メニューの文字 */
+  --sd-menu-border: #a9b2be;      /* メニューのふち */
+  --sd-menu-head-fg: #1d4e8f;     /* メニュー見出しの文字 */
+  --sd-menu-sep: #dfe3e9;         /* メニューの区切り線 */
+  --sd-overlay: rgba(0,0,0,.45);  /* タグ入力を開いたときの背面の暗幕 */
+  --sd-shadow: rgba(0,0,0,.5);    /* 浮かせた部品の影の色（トラック選択メニュー） */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--sd-bg); color: var(--sd-fg);
+  font: 12px/1.5 -apple-system, "Hiragino Sans", sans-serif;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+#toolbar { display: flex; gap: 6px; padding: 8px 8px 4px; flex-wrap: wrap; }
+#toolbar button {
+  background: var(--sd-btn-bg); color: var(--sd-btn-fg); border: 1px solid var(--sd-btn-border);
+  border-radius: 4px; padding: 4px 10px; cursor: pointer; white-space: nowrap;
+}
+#toolbar button:hover { background: var(--sd-btn-bg-hover); }
+/* 「更新」はいちばん使う操作なので目立たせる */
+#toolbar button.primary { background: var(--sd-accent); border-color: var(--sd-accent); color: var(--sd-accent-fg); font-weight: 700; }
+#toolbar button.primary:hover { background: var(--sd-accent-hover); border-color: var(--sd-accent-hover); }
+/* 走査中は押しても効かないので、押せないことを見た目で伝える
+   （Chromiumはdisabledな要素にも:hoverが効くため、primaryのhoverも打ち消す） */
+#toolbar button:disabled,
+#toolbar button.primary:disabled,
+#toolbar button.primary:disabled:hover {
+  background: var(--sd-btn-bg); border-color: var(--sd-btn-border); color: var(--sd-btn-fg-disabled); cursor: default;
+}
+/* 2回押し確定の待機状態（−フォルダ・🏷自動）。この2つは ⋯ メニューの中にあるので、
+   #toolbar だけでなく #moreMenu の中でも同じ赤が出るよう両方に効かせる（片方だけだと
+   「押したのに赤くならない＝2回押しの合図が消える」） */
+#toolbar button.arm, #moreMenu button.arm { background: var(--sd-arm-bg); border-color: var(--sd-arm-border); color: var(--sd-arm-fg); }
+/* ⋯ と ▲ のような記号だけの小さいボタン。文字数が少ないぶん左右の余白を詰めて、
+   検索欄に使える幅をできるだけ残す */
+.iconbtn { flex: none; padding: 4px 8px; }
+/* チェックが付いている間の ⋯（この中に「書き出す」がある、という合図）。
+   色は☑モードONと同じ黄土色＝「チェックまわりの話」だと一目で結び付く */
+#toolbar button.mark { background: var(--sd-mark-bg); border-color: var(--sd-mark-border); color: var(--sd-mark-fg); }
+/* ⋯ の中身。上のボタン列の下に浮かせて出す（場所はJSがボタンの位置から計算して入れる）。
+   縦に並べて、押すものの名前をフルで読ませる＝上の列では出せなかった説明を here で補う */
+#moreMenu {
+  position: fixed; z-index: 20;
+  background: var(--sd-menu-bg); color: var(--sd-menu-fg);
+  border: 1px solid var(--sd-menu-border); border-radius: 6px;
+  box-shadow: 0 4px 16px var(--sd-shadow);
+  display: flex; flex-direction: column; gap: 2px; padding: 4px; min-width: 170px;
+}
+#moreMenu.hidden { display: none; }
+#moreMenu button {
+  background: none; color: var(--sd-menu-fg); border: 1px solid transparent; border-radius: 4px;
+  padding: 6px 10px; cursor: pointer; text-align: left; white-space: nowrap; font-size: 12px;
+}
+#moreMenu button:hover { background: var(--sd-btn-bg-hover); }
+#search {
+  flex: 1; min-width: 60px; background: var(--sd-input-bg); color: var(--sd-input-fg);
+  border: 1px solid var(--sd-input-border); border-radius: 4px; padding: 4px 8px;
+}
+/* 未入力のときの案内文字。指定しないとブラウザ既定の #757575 になり、いまの白地でも 4.61:1 と
+   ぎりぎり（暗い配色に戻すと #1b1b1b の上で 3.74:1 ＝不合格）。配色を替えても崩れないよう必ず明示する */
+#search::placeholder, #tagInput::placeholder { color: var(--sd-placeholder); }
+
+/* ①種類 → ②場所 → ③場面 の3段（③は最大3行に分かれる）。上から順に選ぶ導線なので必ず縦に積む */
+/* 左右の余白は #filterRow ではなく .fstep 側に持たせる。こうすると色を塗った帯が
+   パネルの左端から右端まで通り、段の切り替わりが遠目でも分かる（色分け・2026-08-04） */
+#filterRow { display: flex; flex-direction: column; gap: 4px; padding: 4px 0; }
+/* 段そのものの形。色は下の .sec1〜.sec3 が入れる（ここでは帯の場所だけ確保しておき、
+   色を持たない段があっても中身の位置がズレないよう transparent を既定にする）。
+   左の 4px（帯）＋4px（内側）＝8px は、#toolbar・#footer の左余白 8px と同じ。
+   こうすると帯を足しても中身の使える幅が前と1pxも変わらない
+   （前：8+8の余白／後：4+4+8。どちらも合計16px。280pxのパネルで3-aが1行に収まる条件）。
+   上下の余白は 0。座布団を見やすくしようと 2px 入れていたが、①②③の3段ぶんで
+   ④の一覧が縦に 20px（約0.5行）痩せる（実測 257.5px → 237.5px）。段の高さは中の
+   ボタン・プルダウンで足りているので、縦は1pxも足さない。
+   【この 20px を測った条件】③が3行に開いて①②と合わせて5段出ている状態＝上下に2pxずつ×5段。
+   test/harness.html の同じ話のコメントにある 12px は③が1行＝3段だけの状態（枠380×660px）で
+   測った値で、条件が違うだけでどちらの数字も正しい
+   （test/harness.html の「④の一覧の高さ」が、あとから縦を食い潰されたら赤くなる） */
+.fstep {
+  display: flex; gap: 6px; align-items: center; min-width: 0;
+  padding: 0 8px 0 4px; border-left: 4px solid transparent;
+}
+/* 「フリー/楽曲」が2行に折れないだけの幅を確保しつつ、①②③④の頭を縦にそろえる */
+.fnum { flex: none; width: 66px; font-size: 11px; color: var(--sd-fg-dim); white-space: nowrap; }
+/* パネルを細くしたときはボタンの文字を折らず、ボタンごと次の行へ回す */
+#kindFilter, #srcFilter, .tagrow { display: flex; gap: 2px; flex-wrap: wrap; min-width: 0; }
+/* ③の各段の入れ物。3-a（フリー/楽曲）はボタン列なので、細いパネルで折り返したときに
+   高さが伸びすぎないよう上限を付ける。3-b（場面）3-c（内訳）はプルダウン1個なので届かない */
+.tagrow { flex: 1; max-height: 72px; overflow-y: auto; align-content: flex-start; }
+/* 出しても意味がない段（フリー/楽曲・内訳）は行ごと消す */
+.fstep.hidden { display: none; }
+
+/* 絞り込みを畳んだ状態。①②③の段（最大5行＝実測138px）を丸ごと消し、
+   かわりに1行（22px）のサマリーだけ残す＝差し引き 116px を④の一覧へ渡す。
+   #filterRow を消すだけにして中身は触らない＝開き直したとき前と1pxも変わらない */
+body.filters-collapsed #filterRow { display: none; }
+/* サマリーの出し入れは .hidden の1本だけで決める（ほかの浮かせた入れ物と同じやり方）。
+   ここに body.filters-collapsed #filterSummary{display:flex} を足すと、詳しさ（0,1,1,1）が
+   #filterSummary.hidden（0,1,1,0）に勝ってしまい、.hidden を付けても消えない状態が生まれる＝
+   「畳んでいないのにサマリーが出る」事故の温床になるので、二重に持たせないこと */
+#filterSummary {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+  margin: 4px 0; padding: 3px 8px 3px 4px; cursor: pointer;
+  font-size: 11px; color: var(--sd-fg-dim);
+  /* 左の帯は①②③の3色を上から順に並べた縦グラデーション＝「畳んである3段ぶん」を色で示す。
+     単色にすると、どの段が畳まれているのか色分けの手がかりが消える */
+  border-left: 4px solid transparent;
+  border-image: linear-gradient(var(--sd-sec1) 0 33.3%, var(--sd-sec2) 33.3% 66.6%, var(--sd-sec3) 66.6% 100%) 1;
+}
+#filterSummary.hidden { display: none; }
+#filterSummary:hover { background: var(--sd-btn-bg-hover); }
+.fsumlabel { flex: none; width: 66px; white-space: nowrap; }
+/* 長い場面名でも横にあふれさせず「…」で切る（▼は必ず右端に残す） */
+#fsumText { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* サマリーの中の①②③の値は、それぞれの段の色で書く＝畳んでも「どの段の話か」が分かる */
+#fsumText .s1 { color: var(--sd-sec1); }
+#fsumText .s2 { color: var(--sd-sec2); }
+#fsumText .s3 { color: var(--sd-sec3); }
+#fsumText .sep { color: var(--sd-fg-dim); }
+.fsumarrow { flex: none; color: var(--sd-fg-dim); }
+
+/* ===== ①②③④の色分け（2026-08-04 ユーザー依頼「テロップ工房のように分かりやすく」）=====
+   1つの段につき3つを同じ色にする：左の帯（4px）・座布団（下地）・見出しの文字。
+   【座布団まで色にする理由】帯と見出しの文字だけだと、上から下へ目を動かしたときに
+   「どこで段が切り替わったか」に気づけない（テロップ工房の実機お試しで出た指摘）。
+   【テロップ工房の色をそのまま持ってこない理由】あちらは暗い配色なので座布団が濃い色。
+   こちらは明るい配色なので、座布団＝ごく薄い色・帯と文字＝濃い色、と役割が逆になる。
+   【③の3段が同じ色の理由】フリー/楽曲・場面・内訳はどれも「③の絞り込み」なので、
+   同じ色にして"どこまでが③か"を示す。別々の色にすると5段あるように見えてしまう。 */
+.sec1 { background: var(--sd-sec1bg); border-left-color: var(--sd-sec1); }
+.sec2 { background: var(--sd-sec2bg); border-left-color: var(--sd-sec2); }
+.sec3 { background: var(--sd-sec3bg); border-left-color: var(--sd-sec3); }
+/* 見出しの文字（.fnum の --sd-fg-dim）より強い指定にするため、親のクラスと2つ重ねる */
+.sec1 > .fnum { color: var(--sd-sec1); }
+.sec2 > .fnum { color: var(--sd-sec2); }
+.sec3 > .fnum { color: var(--sd-sec3); }
+/* ③の場面・内訳のプルダウン。ボタン列だと場面が20種類前後あって段が何行にも折り返し、
+   ④の一覧を下へ押し下げてしまうため（中身は場面の名前だけなので行数は増えない）。
+   幅280pxのパネルでも横にはみ出さないよう、min-width:0（フレックスの「中身より小さく
+   ならない」を解除）と max-width:100%（行の幅を超えない）の2つで行の幅まで縮むようにする。
+   実測ではどちらか片方でもあふれは止まるが、片方だけに頼ると、もう片方を消したときに
+   幅の検査では気づけないため2つとも残す（test/harness.html が両方の存在を見張っている）。
+   右だけ余白を広げているのはChromiumが右端に描く▼のぶんの場所取り（約16px）。
+   ここを空けないと選んでいる項目の最後の文字が▼と重なって読めなくなる
+   （<select>には text-overflow が効かず「…」も出ないので、切れたことにも気づけない。
+   幅そのものは足りないままなので、全文は<select>のtitle＝ホバー説明で読ませる） */
+.fsel {
+  flex: 1; min-width: 0; max-width: 100%;
+  background: var(--sd-input-bg); color: var(--sd-input-fg); border: 1px solid var(--sd-input-border);
+  border-radius: 4px; padding: 3px 20px 3px 6px; font-size: 11px; cursor: pointer;
+}
+/* 開いたときの選択肢。CEP（Premiere）ではOS側のネイティブ描画になり、
+   この指定が効かないことがある（効かない場合はOSの既定色で出る） */
+.fsel option { background: var(--sd-input-bg); color: var(--sd-input-fg); }
+.kf {
+  background: none; color: var(--sd-pill-fg); border: 1px solid transparent; padding: 3px 8px;
+  border-radius: 10px; cursor: pointer; font-size: 11px; white-space: nowrap;
+}
+.kf:hover { color: var(--sd-pill-fg-hover); }
+.kf.on { background: var(--sd-accent); border-color: var(--sd-accent); color: var(--sd-accent-fg); }
+#kindRow { display: flex; gap: 4px; align-items: center; margin-top: 8px; }
+.kmlabel { font-size: 11px; color: var(--sd-fg-dim); margin-right: 2px; }
+.km {
+  background: none; color: var(--sd-pill-fg); border: 1px solid var(--sd-km-border); padding: 2px 9px;
+  border-radius: 10px; cursor: pointer; font-size: 11px;
+}
+.km.on { background: var(--sd-accent); border-color: var(--sd-accent); color: var(--sd-accent-fg); }
+
+/* ④の見出し。①②③のラベルと頭をそろえ、下のリストが4段目だと分かるようにする。
+   左は .fstep と同じ「帯 4px ＋内側 4px」なので、①②③④のラベルの頭が縦一直線にそろう
+   （harness が実測で見張る）。右の余白 8px も .fstep と同じ */
+#gridHead {
+  display: flex; align-items: center; gap: 6px;
+  padding: 2px 8px 3px 4px; font-size: 11px; color: var(--sd-fg-dim);
+  border-left: 4px solid var(--sd-sec4); background: var(--sd-sec4bg);
+}
+#gridHead .gnum { flex: none; width: 66px; white-space: nowrap; color: var(--sd-sec4); }
+#gridCount { color: var(--sd-count-fg); white-space: nowrap; }
+#gridHead .ghint { margin-left: auto; white-space: nowrap; }
+/* 絞り込みを畳む／開くボタン。④の見出しの右端に置く。
+   記号1文字なので幅260pxでも「クリックで挿入」を押し出さない（harness が横あふれ0を見張る） */
+#btnFilterToggle {
+  flex: none; background: none; border: 1px solid transparent; border-radius: 4px;
+  color: var(--sd-sec4); cursor: pointer; font-size: 10px; padding: 1px 5px; line-height: 1.4;
+}
+#btnFilterToggle:hover { background: var(--sd-btn-bg-hover); }
+
+/* 中身は縦1列のリスト（ユーザー要望2026-08-02）。横に折り返すと目が行ったり来たりするため。
+   【④だけ座布団を見出しの帯だけにした理由】一覧の地色まで橙にすると、
+   ★よく使う（--sd-fav-bg）と☑選択中（--sd-checked-bg）の黄色い合図が埋もれて見分けにくくなる。
+   代わりに④の帯（4px）を一覧の下端まで通し、④のかたまりがどこまで続くかを縦線で示す。
+   左は .fstep・#gridHead と同じ「帯 4px ＋内側 4px」、右も同じ 8px なので、
+   帯を足しても一覧に使える幅は前と1pxも変わらない（スクロールバーの位置も変わらない） */
+#grid {
+  flex: 1; overflow-y: auto;
+  padding: 4px 8px 8px 4px;
+  border-left: 4px solid var(--sd-sec4);
+  display: flex; flex-direction: column; gap: 2px;
+}
+/* 行の高さは「1行ぶんの文字＋上下の余白」。余白を 7px→5px にして1行あたり 4px 詰めた。
+   見出しは掴みどころなので本文の行より詰めすぎない（押しにくくなる） */
+.ghead {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 10px; margin-top: 3px; cursor: pointer; user-select: none;
+  font-size: 12px; font-weight: 700; color: var(--sd-ghead-fg);
+  background: var(--sd-ghead-bg); border-radius: 5px;
+}
+.ghead:hover { background: var(--sd-ghead-bg-hover); }
+/* 矢印だけ他の補助文字（--sd-fg-dim）と別の色にしているのは意図的。見出し帯（--sd-ghead-bg・
+   ★は--sd-fav-bg）は本文の地色と違う色なので、同じ補助色だと 4.5:1 に届かない組み合わせが出る。
+   畳む／展開するの唯一の手がかりなのでコントラストを下げないこと */
+.garrow { color: var(--sd-ghead-arrow); flex: none; }
+/* 長いフォルダ名は見出しからはみ出さず「…」で切る（件数バッジは必ず右端に残す） */
+.gname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gcount {
+  margin-left: 6px; flex: none; font-weight: 400; font-size: 10px; color: var(--sd-gcount-fg);
+  background: var(--sd-gcount-bg); border-radius: 8px; padding: 0 7px;
+}
+.card {
+  background: var(--sd-card-bg); border: 1px solid var(--sd-card-border); border-radius: 4px; cursor: pointer;
+}
+.card:hover { border-color: var(--sd-card-border-hover); }
+/* 1行の上下の余白を 6px→4px（1行 35px→31px）。文字の大きさ（13px）は変えない＝読みやすさは据え置きで
+   同じ高さに1割ほど多く並ぶ。ここを 2px 未満にすると指し間違いが増えるので下げすぎない */
+.card.row {
+  display: flex; align-items: center; gap: 8px; padding: 4px 10px;
+}
+.ricon { font-size: 14px; flex: none; }
+.rname {
+  flex: 1; font-size: 13px; color: var(--sd-card-fg);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rusage {
+  flex: none; font-size: 10px; color: var(--sd-usage-fg);
+  background: var(--sd-usage-bg); border-radius: 8px; padding: 0 7px;
+}
+.ghead.fav { background: var(--sd-fav-bg); color: var(--sd-fav-fg); }
+.ghead.fav:hover { background: var(--sd-fav-bg-hover); }
+.card.row .tagbtn { flex: none; }
+/* ホバー時だけ見せるが、display:noneだと出た瞬間にファイル名の幅が跳ねて
+   省略位置が動くため、場所は常に確保したまま見た目だけ隠す */
+.tagbtn {
+  background: var(--sd-tagbtn-bg); border: none; border-radius: 3px;
+  color: var(--sd-tagbtn-fg); cursor: pointer; font-size: 10px; padding: 1px 4px; visibility: hidden;
+}
+.card:hover .tagbtn { visibility: visible; }
+
+#footer { border-top: 1px solid var(--sd-divider); padding: 6px 8px; }
+/* ボタンどうしの間は 10px→6px。⚙に現在値（A3/A4・上書き）を出したぶん文字が増えたので、
+   その増分を隙間で吸収して1行を保つ。ここが2行に折り返すと④の一覧が26px（約1行）痩せる */
+.frow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.frow label, .frow .trk,
+#setMenu label, #setMenu .trk { display: flex; gap: 4px; align-items: center; font-size: 11px; color: var(--sd-fg-dim); }
+#volume { width: 70px; }
+/* ⚙設定 の中身。フッターのすぐ上に浮かせて出す（場所はJSがフッターの高さから計算して入れる）。
+   浮かせる＝開いても④の一覧が縮まない。閉じているあいだは高さ0なので、
+   ここに何個設定を足しても一覧の縦は1pxも減らない（将来の設定追加もここへ） */
+#setMenu {
+  position: fixed; z-index: 20;
+  background: var(--sd-menu-bg); color: var(--sd-menu-fg);
+  border: 1px solid var(--sd-menu-border); border-radius: 6px;
+  box-shadow: 0 4px 16px var(--sd-shadow);
+  display: flex; flex-direction: column; gap: 8px; padding: 10px;
+}
+#setMenu.hidden { display: none; }
+/* 音量のつまみは行いっぱいまで伸ばす（下の列にあったときより長い＝細かく合わせやすい） */
+#setMenu .vollabel { display: flex; }
+#setMenu #volume { flex: 1; width: auto; min-width: 80px; }
+/* CEPではパネル下端のネイティブselectのリストが画面外に描画されて選べないため自作メニューを使う */
+#aTrackMenu {
+  /* ⚙設定（z-index:20）より必ず手前。低いパネルでは⚙設定にかぶせて開く（placeTrackMenu の第2段）ので、
+     同じ 20 のままだと「index.html の並び順で手前が決まる」暗黙の約束に命綱を預けることになる。
+     並びを入れ替えただけで無言で背面に落ち、押せなくなる（矩形だけ見る検査では気づけない） */
+  position: fixed; bottom: 56px; left: 8px; z-index: 21;
+  background: var(--sd-menu-bg); color: var(--sd-menu-fg); border: 1px solid var(--sd-menu-border); border-radius: 6px;
+  max-height: 280px; overflow-y: auto; min-width: 150px;
+  box-shadow: 0 4px 16px var(--sd-shadow);
+}
+#aTrackMenu.hidden { display: none; }
+.tmhead {
+  padding: 5px 12px; font-size: 10px; color: var(--sd-menu-head-fg);
+  border-bottom: 1px solid var(--sd-menu-sep); user-select: none;
+}
+.tmi { padding: 5px 12px; cursor: pointer; font-size: 12px; }
+.tmi.on { background: var(--sd-accent); color: var(--sd-accent-fg); }
+.tmi:hover { background: var(--sd-accent); color: var(--sd-accent-fg); }
+.fbtn {
+  background: var(--sd-btn-bg); color: var(--sd-btn-fg); border: 1px solid var(--sd-btn-border);
+  border-radius: 4px; padding: 4px 8px; cursor: pointer; white-space: nowrap;
+}
+/* ⚙設定の中のボタン（挿入先A3/A4）は幅に余裕があるので、下の列より押しやすく広く取る */
+#setMenu .fbtn { padding: 4px 10px; }
+.fbtn:disabled { color: var(--sd-btn-fg-disabled); cursor: default; }
+#btnCheckMode { margin-left: auto; }
+#btnCheckMode.on { background: var(--sd-mark-bg); border-color: var(--sd-mark-border); color: var(--sd-mark-fg); }
+#btnBulk {
+  background: var(--sd-accent); color: var(--sd-accent-fg); border: 1px solid var(--sd-accent);
+  border-radius: 4px; padding: 4px 10px; cursor: pointer; white-space: nowrap;
+}
+#btnBulk:disabled { background: var(--sd-btn-bg); border-color: var(--sd-btn-border); color: var(--sd-btn-fg-disabled); cursor: default; }
+.rcheck { flex: none; margin: 0; }
+#status { min-height: 16px; font-size: 11px; padding-top: 3px; }
+#status.error { color: var(--sd-error); }
+#status.success { color: var(--sd-success); }
+
+#tagModal {
+  position: fixed; inset: 0; background: var(--sd-overlay);
+  display: flex; align-items: center; justify-content: center; z-index: 10;
+}
+#tagModal.hidden { display: none; }
+.modal-box {
+  background: var(--sd-menu-bg); border: 1px solid var(--sd-menu-border); border-radius: 6px;
+  padding: 14px; width: 85%; max-width: 320px;
+}
+#tagModalName { font-size: 11px; color: var(--sd-fg-dim); margin-bottom: 8px; word-break: break-all; }
+#tagInput {
+  width: 100%; background: var(--sd-input-bg); color: var(--sd-input-fg);
+  border: 1px solid var(--sd-input-border); border-radius: 4px; padding: 5px 8px;
+}
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+.modal-btns button {
+  background: var(--sd-btn-bg); color: var(--sd-btn-fg); border: 1px solid var(--sd-btn-border);
+  border-radius: 4px; padding: 4px 14px; cursor: pointer;
+}
+#tagSave { background: var(--sd-accent); border-color: var(--sd-accent); color: var(--sd-accent-fg); }
+
+.empty { color: var(--sd-fg-dim); text-align: center; padding: 30px 10px; line-height: 1.8; }
+
+/* ☑モードで選ばれている行（チェックボックスだけでは見落とすため行ごと色を変える） */
+.card.row.checked { background: var(--sd-checked-bg); border-color: var(--sd-checked-border); }
+/* .card:hover より強い指定なので、ホバーの青枠はここでも書かないと出ない */
+.card.row.checked:hover { border-color: var(--sd-card-border-hover); }
+.card.row.checked .rname { color: var(--sd-checked-fg); }

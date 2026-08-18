@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/style.css">
+<!-- 「選ぶ欄」の共通部品。正本は ~/premiere-extensions/shared/ 、配布は shared/deploy.sh -->
+<link rel="stylesheet" href="css/smartselect.css">
+</head>
+<body>
+  <!-- 上のボタン列は「毎回使う2つ（更新・検索）」だけ出し、たまにしか使わない4つは ⋯ の中へ入れる。
+       理由＝6ボタン＋検索は幅380pxで2行に折り返し、④の一覧の縦を 26px ぶん食っていた（実測 77px）。
+       ⋯ に入れた4つは id も title もそのままなので、押したときの動きは1つも変わらない。 -->
+  <div id="toolbar">
+    <button id="btnRescan" class="primary" title="素材を読み直す（PCフォルダとプロジェクト内の両方。フォルダに素材を足したらこれを押す）">⟳ 更新</button>
+    <input id="search" type="text" placeholder="検索（名前・タグ）">
+    <button id="btnMore" class="iconbtn" title="たまにしか使わない操作（フォルダの登録・解除／タグの自動付け／書き出し）">⋯</button>
+  </div>
+  <!-- ⋯ の中身。解除・タグ自動は「2回押して確定」＝1回目で赤くなる（.arm）ので、
+       中のボタンを押しただけではこのメニューを閉じない。閉じると赤い確定待ちが見えなくなり、
+       ユーザーは「押したのに何も起きない」と感じてしまう。
+       ただし用が済んだとき（登録した・解除した・タグを付けた・書き出しに進んだ）は main.js が閉じる
+       ＝開けっぱなしだと結果の案内（下段）に一覧ごとかぶって見えない。
+       ここのボタンの文字は、案内文の中で名指しするときの言葉そのもの（main.js の btnName が読む）。
+       文言を変えると案内文も自動で追いかけるので、案内側に名前を直書きしないこと。 -->
+  <div id="moreMenu" class="hidden">
+    <button id="btnAddFolder" title="素材フォルダを登録">＋　素材フォルダを登録</button>
+    <button id="btnRemoveFolder" title="登録した素材フォルダを選んで解除（ファイルは消えない）">−　素材フォルダを解除</button>
+    <button id="btnAutoTag" title="タグの無い効果音・BGMにファイル名から自動でタグを付ける">🏷　タグを自動で付ける</button>
+    <button id="btnSend" title="チェックした効果音・BGMをzipにまとめて書き出す（人に送る用）">📦　チェックしたものを書き出す</button>
+  </div>
+
+  <!-- sec1〜sec3 は「段ごとの色分け」の印（css/style.css の :root と .sec1〜.sec3）。
+       ③の3段（フリー/楽曲・場面・内訳）はどれも③の絞り込みなので同じ sec3 を付ける。
+       ④は「段」ではなく一覧なので sec4 クラスは作らず、#gridHead に --sd-sec4（帯・見出しの文字）と
+       --sd-sec4bg（座布団）、#grid には --sd-sec4（帯だけ）を直接指定している（項目38(c)の裁定）。
+       #grid に座布団は無い＝一覧の地色は塗らない
+       （★よく使う・☑選択中の黄色い合図を埋もれさせないため／項目38(a)の裁定） -->
+  <div id="filterRow">
+    <div class="fstep sec1">
+      <span class="fnum">① 種類</span>
+      <div id="kindFilter">
+        <button class="kf on" data-k="" title="効果音とBGMを両方表示">すべて</button>
+        <button class="kf" data-k="se" title="効果音だけ表示">効果音</button>
+        <button class="kf" data-k="bgm" title="BGMだけ表示（名前や曲の長さで自動判定・🏷から手動指定も可）">BGM</button>
+      </div>
+    </div>
+    <div class="fstep sec2">
+      <span class="fnum">② 場所</span>
+      <div id="srcFilter">
+        <button class="kf" data-s="project" title="いま開いているプロジェクトに読み込み済みの素材">プロジェクト内</button>
+        <button class="kf on" data-s="folder" title="登録したPCの素材フォルダ">PCフォルダ</button>
+      </div>
+    </div>
+    <!-- ③はフォルダ階層をそのまま出さず「フリー/楽曲・場面・内訳」の3段に読み替える。
+         3-a（フリー/楽曲）と3-c（内訳）は意味があるときだけ出す（buildTagFilters）。
+         中身は buildTagFilters が作る。3-aは3個だけなのでボタン列、
+         3-b（場面）と3-c（内訳）は数が多いのでプルダウン（<select>） -->
+    <div class="fstep sec3 hidden" id="licStep">
+      <span class="fnum">フリー/楽曲</span>
+      <div id="licFilter" class="tagrow"></div>
+    </div>
+    <div class="fstep sec3" id="sceneStep">
+      <span class="fnum" id="sceneLabel">③ 場面</span>
+      <div id="sceneFilter" class="tagrow"></div>
+    </div>
+    <div class="fstep sec3 hidden" id="subStep">
+      <span class="fnum">内訳</span>
+      <div id="subFilter" class="tagrow"></div>
+    </div>
+  </div>
+
+  <!-- 絞り込みを畳んだときの1行サマリー。①②③の段（最大5行＝約138px）を消すかわりに、
+       いま何で絞っているかをこの1行（約22px）だけ残す。押すと①②③がまた開く。
+       文字の色は段の色（①水色・②緑・③紫）をそのまま使う＝畳んでも「どの段の話か」が色で分かる。 -->
+  <div id="filterSummary" class="hidden" title="押すと絞り込み（①②③）をまた開きます">
+    <span class="fsumlabel">絞り込み</span>
+    <span id="fsumText"></span>
+    <span class="fsumarrow">▼</span>
+  </div>
+
+  <div id="gridHead">
+    <span class="gnum">④ 中身</span>
+    <span id="gridCount">0件</span>
+    <span class="ghint">クリックで挿入</span>
+    <!-- 一覧をもっと広く見たいときに①②③を畳むボタン。④の見出しの行に置くのは、
+         「畳んだ結果ここが広がる」という因果が目で追える位置だから（押した状態は次回も覚える）。
+         文字は main.js（applyFilterCollapsed）が入れる＝幅があるときは「絞り込み ▲」、
+         細いときは「▲」だけ。記号だけだと④の見出しの中にあるせいで「④を畳む」と誤読される -->
+    <button id="btnFilterToggle" class="iconbtn" title="①②③の絞り込みを畳んで、一覧を広く使う">絞り込み ▲</button>
+  </div>
+
+  <div id="grid"></div>
+
+  <!-- 下の操作列は「押す操作」だけを1行に残す。挿入先トラック・上書き・ホバー再生・音量は
+       いちど決めたらほとんど動かさない設定なので ⚙設定 の中へ移した。
+       理由＝7個を1行に並べると幅380pxで3行に折り返し、④の一覧の縦を 57px（約2行ぶん）食っていた（実測114px）。 -->
+  <div id="footer">
+    <div class="frow">
+      <!-- 文字は main.js（syncSettingsBtn）が入れる＝幅があるときは現在値つき「⚙ A3/A4・上書き」、
+           細いときは「⚙ 設定」。中に隠した挿入先と上書きは、事故っても気づけない設定なので
+           ボタンの文字を見張り役にしている（とくに上書きは既定ONで、既にある音を消してしまう） -->
+      <button id="btnSettings" class="fbtn" title="挿入先トラック・上書き・ホバー再生・音量の設定">⚙ 設定</button>
+      <button id="btnCheckMode" class="fbtn" title="ONの間は効果音・BGMをクリックすると挿入せずチェックが付く">☑モード</button>
+      <button id="btnClearChecks" class="fbtn" disabled title="チェックをすべて外す">全解除</button>
+      <button id="btnBulk" disabled title="チェックした効果音・BGMを選択クリップの頭にランダム配置">一括挿入</button>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <!-- ⚙設定 の中身。中を押しても閉じない（続けて2つ3つ変えることがあるため）。
+       挿入先トラックの選択メニュー（#aTrackMenu）はこの上にさらに重なって開く。
+       ⚙設定はその土台なので、⚙設定が閉じるときは #aTrackMenu も必ず道連れにする（main.js の hidePopup）。
+       パネルが低いと上に開く余地が無いので、そのときは⚙設定にかぶせてでも画面内に収める（placeTrackMenu）。 -->
+  <div id="setMenu" class="hidden">
+    <!-- labelだと「BGM」の文字クリックが先頭ボタン(SE側)に転送されるためspanにする -->
+    <span class="trk">挿入先 SE <button id="seTrackBtn" class="fbtn" title="効果音を配置するオーディオトラック">A3</button> BGM <button id="bgmTrackBtn" class="fbtn" title="BGMを配置するオーディオトラック">A4</button></span>
+    <label title="ONだと挿入先トラックにすでにある音を上書きします（OFFなら空いているところへ置きます）"><input type="checkbox" id="modeOverwrite" checked>上書き</label>
+    <label title="行にカーソルを乗せると音が試聴できます"><input type="checkbox" id="hoverPlay" checked>ホバー再生</label>
+    <label class="vollabel" title="プレビュー音量">音量 <input type="range" id="volume" min="0" max="100" value="60" title="プレビュー音量"></label>
+  </div>
+  <div id="aTrackMenu" class="hidden"></div>
+
+  <div id="tagModal" class="hidden">
+    <div class="modal-box">
+      <div id="tagModalName"></div>
+      <input id="tagInput" type="text" placeholder="タグをカンマ区切りで入力">
+      <div id="kindRow">
+        <span class="kmlabel">種別</span>
+        <button class="km" data-k="" title="名前や曲の長さから自動で見分ける">自動</button>
+        <button class="km" data-k="se">効果音</button>
+        <button class="km" data-k="bgm">BGM</button>
+      </div>
+      <div class="modal-btns">
+        <button id="tagSave">保存</button>
+        <button id="tagCancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/CSInterface.js"></script>
+  <script src="js/autotag.js"></script>
+  <script src="js/main.js"></script>
+<!-- 本体の js のあとに読む。先に欄の中身が作られるので、最初から正しい文字が出る -->
+<script src="js/smartselect.js"></script>
+</body>
+</html>
