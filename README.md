@@ -40,6 +40,9 @@ Premiere Pro の中から、**効果音やBGMをクリック1回でタイムラ�
 4. 「完了しました」と出たら、**Premiere Pro を一度終了して開き直す**
 5. Premiere の上のメニュー「**ウィンドウ**」→「**エクステンション**」→「**素材｜効果音・BGM送り**」
 
+前の版が入っていたときは、`~/Library/Application Support/Adobe/CEP/SozaiDrop_前の版` に日時つきで退避されます
+（パネルの置き場所の外なので、Premiere が同じパネルを2つ読むことはありません）。
+
 ### 手でやる方法
 
 1. 下のフォルダを開く（Finder の「移動」メニュー →「フォルダへ移動…」に貼る）
@@ -49,6 +52,8 @@ Premiere Pro の中から、**効果音やBGMをクリック1回でタイムラ�
    ```
 
 2. この中に `SozaiDrop` フォルダをそのままコピーする
+   - 前の版があって「置き換えますか？」と聞かれたら「**置き換える**」を選ぶ
+     （「両方とも残す」を選ぶと同じパネルが2つになり、正しく動きません）
 3. 署名のないパネルを読み込めるようにする（**これをやらないとメニューに出ません**）。
    ターミナルに貼って実行：
 
@@ -60,14 +65,24 @@ Premiere Pro の中から、**効果音やBGMをクリック1回でタイムラ�
 
 ## 入れ方（Windows・未確認）
 
-1. zip を展開し、中の `SozaiDrop` フォルダを次の場所へコピー
+1. zip を展開する
+2. 中の `install-win.bat` を**ダブルクリック**（管理者として実行する必要はありません）
+   - 青い「Windows によって PC が保護されました」が出たら「詳細情報」→「実行」
+3. 「完了しました」と出たら、Premiere Pro を終了して開き直す
 
-   ```text
-   C:\Users\(あなたの名前)\AppData\Roaming\Adobe\CEP\extensions
-   ```
+前の版が入っていたときは、`%APPDATA%\Adobe\CEP\SozaiDrop_backup` に日時つきで退避されます。
 
-2. `install-win.bat` を右クリック →「管理者として実行」（署名なしパネルの許可を入れます）
-3. Premiere Pro を終了して開き直す
+手でやる場合は、`SozaiDrop` フォルダを次の場所へコピーし（前の版があれば先に消してから）、
+
+```text
+C:\Users\(あなたの名前)\AppData\Roaming\Adobe\CEP\extensions
+```
+
+コマンドプロンプトに次を貼って実行してから、Premiere Pro を開き直します。
+
+```bat
+for %v in (9 10 11 12) do reg add "HKCU\Software\Adobe\CSXS.%v" /v PlayerDebugMode /t REG_SZ /d 1 /f
+```
 
 ---
 
@@ -87,6 +102,7 @@ Premiere Pro の中から、**効果音やBGMをクリック1回でタイムラ�
 
 `~/Library/Application Support/Adobe/CEP/extensions/SozaiDrop` フォルダを
 ゴミ箱に入れて、Premiere を開き直すだけです。素材そのものには一切さわりません。
+前の版の控え（`~/Library/Application Support/Adobe/CEP/SozaiDrop_前の版`）も、要らなければゴミ箱へ。
 
 ---
 
